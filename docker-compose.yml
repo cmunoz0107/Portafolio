@@ -1,0 +1,11 @@
+version: '2'
+services:
+  mysql:
+    image: 'mysql:5.7'
+    container_name: proyecto_final-db
+    environment:
+      MYSQL_ROOT_PASSWORD: 'root'
+    volumes:
+      - ~/Code/mysqldb:/var/lib/mysql
+    ports:
+      - "3310:3306"
