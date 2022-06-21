@@ -1,6 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
-import querys from "./querys.js";
+import {ingresoProductos, login, registerChofer, registerUser, stock, users, selects, getIngresos} from "./controller.js";
 import cors from "cors";
 
 const app = express();
@@ -10,27 +10,18 @@ app.use(cors());
 app.set("port", process.env.PORT || 8080);
 app.get("/", async (req, res) => {
   try {
-    const resultElements = await querys.getstock();
+    const resultElements = await stock();
     res.status(200).json({ elements: resultElements });
   } catch (e) {
-    console.log(e); // console log the error so we can see it in the console
+    console.log(e); 
     res.sendStatus(500);
   }
-});
-
-app.post("/ingreso", async (req, res) => {
-  const ingreso = req.body.ingreso;
-
-  const resultElements = await querys.ingresoProducto(ingreso);
-  console.log(resultElements);
-  if (!resultElements) res.sendStatus(500);
-  res.sendStatus(200);
 });
 
 app.post("/login", async (req, res) => {
   const credentials = req.body.credentials;
   try {
-    const resultElements = await querys.login(credentials);
+    const resultElements = await login(credentials);
     if (!resultElements) res.status(200).json({ valid: false });
 
     res.status(200).json({ valid: true });
@@ -42,7 +33,7 @@ app.post("/login", async (req, res) => {
 app.post("/registerUser", async (req, res) => {
   const data = req.body.data;
   try {
-    const resultElements = await querys.registerUser(data);
+    const resultElements = await registerUser(data);
 
     res.status(200).json(resultElements);
   } catch (error) {
@@ -53,7 +44,7 @@ app.post("/registerUser", async (req, res) => {
 app.post("/registerChofer", async (req, res) => {
   const data = req.body.data;
   try {
-    const resultElements = await querys.registerChofer(data);
+    const resultElements = await registerChofer(data);
 
     res.status(200).json(resultElements);
   } catch (error) {
@@ -61,6 +52,46 @@ app.post("/registerChofer", async (req, res) => {
   }
 });
 
+app.get("/getUsers", async (req, res) => {
+  try {
+    const resultElements = await users();
+
+    res.status(200).json(resultElements);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+app.get("/getSelects", async (req, res) => {
+  try {
+    const resultElements = await selects();
+
+    res.status(200).json(resultElements);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+app.post("/ingresoProducto", async (req, res) => {
+  try {
+    const data = req.body.data;
+    const resultElements = await ingresoProductos(data);
+    res.status(200).json(resultElements);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
+app.get("/getIngresos", async (req, res) => {
+  try {
+    const resultElements = await getIngresos();
+    
+    res.status(200).json(resultElements);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 app.listen(app.get("port"), () => {
-  console.log("server inicializado");
+  console.log("server inicializado", app.get("port"));
 });

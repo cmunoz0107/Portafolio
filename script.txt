@@ -1,0 +1,213 @@
+create database conexion_bd_chada;
+drop database conexion_bd_chada;
+
+
+show databases;
+
+use conexion_bd_chada;
+-- Ceacion de la tabla Tipo Producto-----------------------------
+Create table tipo_Producto(
+cod_Tipo int not null auto_increment,
+nombre varchar(50) not null,
+PRIMARY KEY (cod_Tipo)
+);
+-- Insertar datos en la tabla tipo producto
+INSERT INTO tipo_Producto (nombre) VALUES ('Herbicida');
+
+
+-- Creacion de la tabla region-----------------------------------
+Create table region(
+cod_Region int not null auto_increment,
+nombre varchar(50) not null,
+PRIMARY KEY (cod_Region)
+);
+
+-- Insertar datos en la tabla Region
+INSERT INTO region (nombre) VALUES ('Coquimbo');
+INSERT INTO region ( nombre) VALUES ('Metropolitana');
+INSERT INTO region ( nombre) VALUES ( 'Ohiggins');
+select * from region;
+
+-- Creacion de la tabla comuna------------------------------------
+Create table comuna(
+cod_Comuna int not null auto_increment,
+nombre varchar(50) not null,
+PRIMARY KEY (cod_Comuna)
+);
+-- Insertar datos en la tabla comuna
+INSERT INTO comuna (nombre) VALUES ('Ovalle');
+INSERT INTO comuna (nombre) VALUES ('Combarbala');
+INSERT INTO comuna (nombre) VALUES ('Monte Patria');
+INSERT INTO comuna (nombre) VALUES ('Calera de Tango');
+INSERT INTO comuna (nombre) VALUES ('Paine');
+INSERT INTO comuna (nombre) VALUES ('Alhue');
+INSERT INTO comuna (nombre) VALUES ('Las Delicias');
+INSERT INTO comuna (nombre) VALUES ('Machali');
+select * from comuna;
+
+-- Creacion de la tabla Area------------------------------
+Create table area(
+cod_Area int not null auto_increment,
+nombre varchar(50) not null,
+PRIMARY KEY (cod_Area)
+);
+-- Insertar Datos en la tabla area
+INSERT INTO area (nombre) VALUES ('Packing');
+INSERT INTO area (nombre) VALUES ('Mantención');
+INSERT INTO area (nombre) VALUES ('Oficina de Campo');
+INSERT INTO area (nombre) VALUES ('Campo');
+INSERT INTO area (nombre) VALUES ('Finanzas');
+INSERT INTO area (nombre) VALUES ('Operaciones');
+
+-- Creacion de la tabla Bodeguero---------------------------
+Create table bodeguero(
+cod_Bodeguero int not null auto_increment,
+nombre varchar(25) not null,
+apellidos varchar(30) not null,
+correo varchar(40)not null,
+password varchar(10)not null,
+PRIMARY KEY (cod_Bodeguero)
+);
+-- Insertar datos en la tabla Bodeguero
+INSERT INTO bodeguero (nombre, apellidos, correo, password) VALUES ('Pedro', 'Rodriguez Cerda', 'prodriguez@hchada.com','abc123');
+select * from bodeguero;
+
+
+-- Creacion de la tabla Unidad de medida----------------------
+Create table uni_Medida(
+cod_Medida int not null auto_increment,
+nombre varchar(50) not null,
+PRIMARY KEY (cod_Medida)
+);
+
+INSERT INTO uni_Medida (nombre) VALUES ('Litros');
+
+-- creacion de la tabla chofer--------------------------------
+Create table chofer(
+cod_chofer int not null auto_increment,
+nombre varchar(25) not null,
+apellidos varchar(30) not null,
+edad int not null,
+correo varchar(40),
+PRIMARY KEY (cod_chofer)
+);
+INSERT INTO chofer (nombre, apellidos, edad, correo) VALUES ('Raul', 'Perez Rodriguez', 32, 'rperez@gmail.com');
+select * from chofer; 
+
+
+-- Creacion de la tabla Empleado-------------------------------
+Create table empleado (
+cod_Empleado int not null auto_increment,
+nombre varchar(25) not null,
+apellidos varchar(30) not null,
+fono int not null,
+correo varchar(40),
+PRIMARY KEY (cod_Empleado)
+);
+-- Insertar datos en la tabla empleado
+INSERT INTO empleado (nombre, apellidos, fono, correo) VALUES ('Nicolas', 'Arancibia', 25 , 'narancibia@hchada.com');
+select * from empleado;
+
+-- Bodega--------------------------------------------------------------
+Create table bodega(
+cod_Bodega int not null auto_increment,
+nombre varchar(30) not null,
+direccion varchar(50) not null,
+cod_Comuna int not null,
+cod_Region int not null,
+PRIMARY KEY (cod_Bodega),
+foreign key(cod_Comuna) references comuna(cod_Comuna),
+foreign key(cod_Region) references region(cod_Region)
+);
+INSERT INTO bodega (nombre, direccion, cod_comuna, cod_region) VALUES ('Campo Delicias', 'Codegua S/N', 7, 3);
+
+-- Creacion de la tabla Proveedor------------------------------------------------
+Create table proveedor(
+cod_Proveedor int not null auto_increment,
+nombre varchar(25) not null,
+direccion varchar(60) not null,
+cod_Comuna int not null,
+cod_Region int not null,
+fono int not null,
+correo varchar(40) not null,
+contacto  varchar(40) not null,
+PRIMARY KEY (cod_Proveedor),
+foreign key(cod_Comuna) references comuna(cod_Comuna),
+foreign key(cod_Region) references region(cod_Region)
+);
+-- Insertar Datos en la tabla Proveedor
+INSERT INTO proveedor (nombre, direccion, cod_comuna, cod_region, fono, correo, contacto) VALUES ('Bayern', 'Las Condes 27', 1, 2, 2257858, 'contacto@bayern.com', 'Felipe Saavedra');
+select * from proveedor;
+
+
+
+-- Creacion de tabla Producto-------------------------------------------
+Create table producto(
+cod_Producto int not null auto_increment,
+nombre varchar(40) not null,
+cod_Proveedor int not null,
+cod_Tipo int not null,
+cod_Medida int not null,
+primary key (cod_Producto),
+foreign key(cod_Proveedor) references proveedor(cod_Proveedor),
+foreign key(cod_Tipo) references tipo_Producto(cod_Tipo),
+foreign key(cod_Medida) references uni_Medida(cod_Medida)
+);
+
+INSERT INTO producto (nombre, cod_Proveedor, cod_Tipo, cod_Medida) VALUES ('Scholar', 1, 1, 1);
+INSERT INTO producto (nombre, cod_Proveedor, cod_Tipo, cod_Medida) VALUES ('Scholar', 1, 1, 1);
+INSERT INTO producto (nombre, cod_Proveedor, cod_Tipo, cod_Medida) VALUES ('Scholar', 1, 1, 1);
+INSERT INTO producto (nombre, cod_Proveedor, cod_Tipo, cod_Medida) VALUES ('Scholar', 1, 1, 1);
+INSERT INTO producto (nombre, cod_Proveedor, cod_Tipo, cod_Medida) VALUES ('Scholar', 1, 1, 1);
+INSERT INTO producto (nombre, cod_Proveedor, cod_Tipo, cod_Medida) VALUES ('Scholar', 1, 1, 1);
+select * from producto;
+
+-- Creacion de la tabla ingreso de productos-----------------------------
+Create table ingreso_Productos(
+cod_Ingreso int not null auto_increment,
+cod_Producto int not null,
+cantidad int not null,
+fecha_Ingreso date not null,
+fecha_Caducidad date,
+primary Key (cod_Ingreso),
+foreign key(cod_Producto) references producto(cod_Producto)
+);
+
+Insert into ingreso_Productos(cod_Producto, cantidad, fecha_Ingreso, fecha_Caducidad) VALUES (1, 5, '2022-03-10', '2023-03-10');
+Create table stock(
+cod_stock int not null auto_increment,
+stock int not null,
+cod_producto int not null,
+primary key (cod_stock),
+foreign key(cod_producto) references producto(cod_producto)
+);
+insert into stock(cod_stock, stock, cod_producto) values (1 ,10, 1);
+select * from ingreso_Productos;
+select * from stock;
+
+-- Consulta a la tabla ingreso de producto
+select pro.nombre as "Nombre Producto", prov.nombre as "Proveedor",tipo.nombre as "Tipo", med.nombre as "Medida", ing.cantidad, ing.fecha_Ingreso, ing.fecha_Caducidad
+from producto pro inner join ingreso_Productos ing on pro.cod_Producto = ing.cod_Producto
+inner join proveedor prov on pro.cod_Proveedor=prov.cod_Proveedor
+inner join tipo_producto tipo on pro.cod_Tipo= tipo.cod_Tipo
+inner join uni_Medida med on pro.cod_Medida=med.cod_Medida;
+
+-- Consulta a la tabla Proveedor
+select prov.nombre, prov.direccion, com.nombre as "Comuna", reg.nombre as "Region", prov.fono, prov.correo, prov.contacto
+from  proveedor prov inner join comuna com on prov.cod_Comuna=com.cod_Comuna
+inner join region reg on prov.cod_Region=reg.cod_Region ;
+
+-- Consulta a la tabla Producto
+select prod.nombre , prov.nombre as "Proveedor",tipo.nombre as "Tipo", med.nombre as "Medida"
+from proveedor prov inner join producto prod on prod.cod_Proveedor=prov.cod_Proveedor
+inner join tipo_producto tipo on prod.cod_Tipo= tipo.cod_Tipo
+inner join uni_Medida med on prod.cod_Medida=med.cod_Medida;
+
+-- Consulta a la tabla bodega
+select bod.nombre, bod.direccion, com.nombre as "Comuna", reg.nombre as "Region"
+from bodega bod inner join comuna com on bod.cod_Comuna=com.cod_Comuna
+inner join region reg on bod.cod_Region=reg.cod_Region;
+
+
+insert into producto (nombre, cod_Proveedor, cod_Tipo, cod_Medida)
+
