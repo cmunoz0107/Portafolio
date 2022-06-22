@@ -1,5 +1,5 @@
 import querys from "./querys.js";
-import moment from 'moment'
+import moment from "moment";
 
 export const ingresoProducto = async (ingreso) => {
   const { cod_Producto, cantidad, fecha_Ingreso, fecha_Caducidad } = ingreso;
@@ -91,11 +91,15 @@ export const selects = async () => {
     const allProductos = await querys.getProducts();
     const choferes = await querys.getChofer();
     const bodegueros = await querys.getBodeguero();
+    const empleados = await querys.getEmpleado();
+    const bodegas = await querys.getBodegas();
 
     return {
       allProductos,
       choferes,
       bodegueros,
+      empleados,
+      bodegas,
     };
   } catch (error) {
     throw error;
@@ -122,7 +126,10 @@ export const ingresoProductos = async (data) => {
       guiaDespacho,
       chofer
     );
-    await querys.updateStock(productos, cantidad);
+    const stock = await querys.getStockByProduct(productos);
+    const newStock = stock ? stock[0].stock : 0;
+    const newCantidad = newStock + parseInt(cantidad);
+    await querys.updateStock(productos, newCantidad);
     return true;
   } catch (error) {
     console.log(error);
@@ -133,7 +140,7 @@ export const ingresoProductos = async (data) => {
 export const getIngresos = async () => {
   try {
     const ingresos = await querys.getListadoIngresos();
-    const newIngresos = setIngresos(ingresos)
+    const newIngresos = setIngresos(ingresos);
     return newIngresos;
   } catch (error) {
     console.log(error);
@@ -141,19 +148,87 @@ export const getIngresos = async () => {
   }
 };
 
+export const getDespachos = async () => {
+    try {
+      const despachos = await querys.getDespachos();
+      const newDespachos = setDespachos(despachos);
+      return newDespachos;
+    } catch (error) {
+      console.log(error);
+      throw error;
+    }
+  };
+
+export const despacho = async (data) => {
+  const {
+    productos,
+    cantidad,
+    fechaDeEgreso,
+    fechaDeCaducidad,
+    bodeguero,
+    guiaDespacho,
+    chofer = null,
+    empleado = null,
+    bodega = null,
+  } = data;
+  try {
+    const stock = await querys.getStockByProduct(productos);
+    const newStock = stock ? stock[0].stock : 0
+
+    if(!(newStock > parseInt(cantidad))) {
+        throw "La cantidad debe ser menor al stock de la bodega"
+    }
+    const newCantidad = newStock - parseInt(cantidad)
+    await querys.updateStock(productos, newCantidad);
+    await querys.insertDespacho(
+      productos,
+      cantidad,
+      fechaDeEgreso,
+      fechaDeCaducidad,
+      bodeguero,
+      guiaDespacho,
+      chofer,
+      empleado,
+      bodega
+    );
+
+    return true;
+  } catch (error) {
+    console.log(error);
+    throw error;
+  }
+};
 
 const setIngresos = (ingresos) => {
-    return ingresos.map(e => {
-        const fechaIngreso = moment(e.fecha_ingreso).format("DD-MM-YYYY");
-        const fechaCaducidad = moment(e.fecha_ingreso).format("DD-MM-YYYY");
-        return {
-            producto: e.Producto,
-            cantidad: e.cantidad,
-            fechaIngreso: fechaIngreso,
-            fechaCaducidad: fechaCaducidad,
-            bodeguero: `${e.nombreBodeguero} ${e.apellidoBodeguero}`,
-            guiaDespacho: e.GuiaDespacho,
-            chofer: `${e.nombreChofer} ${e.apellidoChofer}`
-        }
-    })
-}
+  return ingresos.map((e) => {
+    const fechaIngreso = moment(e.fecha_ingreso).format("DD-MM-YYYY");
+    const fechaCaducidad = moment(e.fecha_Caducidad).format("DD-MM-YYYY");
+    return {
+      producto: e.Producto,
+      cantidad: e.cantidad,
+      fechaIngreso: fechaIngreso,
+      fechaCaducidad: fechaCaducidad,
+      bodeguero: `${e.nombreBodeguero} ${e.apellidoBodeguero}`,
+      guiaDespacho: e.GuiaDespacho,
+      chofer: `${e.nombreChofer} ${e.apellidoChofer}`,
+    };
+  });
+};
+
+const setDespachos = (despachos) => {
+    return despachos.map((e) => {
+      const fechaEgreso = moment(e.FechaEgreso).format("DD-MM-YYYY");
+      const fechaCaducidad = moment(e.fechaCaducidad).format("DD-MM-YYYY");
+      return {
+        producto: e.producto,
+        cantidad: e.cantidad,
+        fechaEgreso: fechaEgreso,
+        fechaCaducidad: fechaCaducidad,
+        bodeguero: `${e.nombreBodeguero} ${e.apellidoBodeguero}`,
+        guiaDespacho: e.Guia,
+        chofer: e.nombreChofer ? `${e.nombreChofer} ${e.apellidoChofer}` : "No aplica",
+        empleado: e.nombreEmpleado ? `${e.nombreEmpleado} ${e.apellidoEmpleado}` : "No aplica",
+        bodega: e.Bodega
+      };
+    });
+  };

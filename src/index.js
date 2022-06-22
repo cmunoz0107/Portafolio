@@ -1,6 +1,6 @@
 import express from "express";
 import bodyParser from "body-parser";
-import {ingresoProductos, login, registerChofer, registerUser, stock, users, selects, getIngresos} from "./controller.js";
+import {ingresoProductos, login, registerChofer, registerUser, stock, users, selects, getIngresos, despacho, getDespachos} from "./controller.js";
 import cors from "cors";
 
 const app = express();
@@ -92,6 +92,26 @@ app.get("/getIngresos", async (req, res) => {
   }
 });
 
+app.post("/despacho", async (req, res) => {
+  try {
+    const data = req.body.data;
+    const resultElements = await despacho(data);
+    res.status(200).json(resultElements);
+  } catch (error) {
+    res.status(500).json(error);
+  }
+});
+
 app.listen(app.get("port"), () => {
   console.log("server inicializado", app.get("port"));
+});
+
+app.get("/getDespachos", async (req, res) => {
+  try {
+    const resultElements = await getDespachos();
+    
+    res.status(200).json(resultElements);
+  } catch (error) {
+    res.status(500).json(error);
+  }
 });
