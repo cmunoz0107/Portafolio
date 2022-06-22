@@ -24,7 +24,7 @@ export const login = async (credentials) => {
     if (response.length > 0) {
       return true;
     }
-    return false;
+    throw "Error en las credenciales"
   } catch (error) {
     console.log(error);
     throw error;

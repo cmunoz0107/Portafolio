@@ -22,7 +22,7 @@ app.post("/login", async (req, res) => {
   const credentials = req.body.credentials;
   try {
     const resultElements = await login(credentials);
-    if (!resultElements) res.status(200).json({ valid: false });
+    console.log(resultElements);
 
     res.status(200).json({ valid: true });
   } catch (error) {
